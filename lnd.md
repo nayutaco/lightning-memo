@@ -283,13 +283,13 @@ lncli --no-macaroons payinvoice <BOLT11 invoice>
 * mutual close
 
 ```bash
-lncli --no-macaroons closechannel <funding_txid> [--output_index <funding_txindex>]
+lncli --no-macaroons closechannel --funding_txid <funding_txid> [--output_index <funding_txindex>]
 ```
 
 * unilateral close
 
 ```bash
-lncli --no-macaroons closechannel --force <funding_txid> [--output_index <funding_txindex>]
+lncli --no-macaroons closechannel --force --funding_txid <funding_txid> [--output_index <funding_txindex>]
 ```
 
 # lncli --help
