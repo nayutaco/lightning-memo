@@ -15,9 +15,16 @@ pip install -r requirements.txt
 ```
 
 * pkg-config、secp256k1のビルドに失敗したためインストール。（2019/4/10追記）
+
 ```bash
 sudo apt install pkg-config
 pip3 install secp256k1
+```
+
+* pythonにmakoというライブラリがいる
+
+```bash
+pip install mako
 ```
 
 ## usage
@@ -69,7 +76,7 @@ py.test -v test.py
 
 ```bash
 # ptarmiganの入ったテストのみ実施
-pytest -v test.py -k ptarmigan
+pytest -v test.py -k 'ptarmigan or PtarmNode'
 
 # 接続(eclair--eclair)のみ実施
 pytest -v test.py -k 'test_connect[eclair_eclair]'
