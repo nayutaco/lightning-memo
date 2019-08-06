@@ -48,6 +48,8 @@ make && make install
 - [`nobootstrap=1`](https://github.com/lightningnetwork/lnd/blob/3036fc01817eedd1821c2945e04c0e79b69a8453/sample-lnd.conf#L96-L99) すると、自動的に他のノードを検索しにいかなくなる
   - `lncli listpeers` で何も出てこないので、そうなのだろう
   - `lnd`がどうやってノードを見つけているのかはわかっていない。mDNSか？
+- `no-macaroons`をtrueにした場合、`lncli`にも`-no-macaroons`がいる。
+  - macaroonsを使う場合、mainnet以外なら`lncli`には`--network=xxxx`で種類を指定する必要があるようだ。
 
 ### 私が使っている設定(bitcoind版)
 
