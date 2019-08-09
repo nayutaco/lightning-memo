@@ -63,6 +63,7 @@ export PATH=$PATH:$GOPATH/bin
 ```bash
 make clean
 make update
+make clients
 make test
 ```
 
