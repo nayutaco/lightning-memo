@@ -83,9 +83,10 @@ rpcpassword=bitcoinpassword
 
 - 指定しない場合に`node_announcement`のIPアドレスが未指定になるかどうかは未確認
   - `getinfo`に出てこないので、たぶん未指定になるだろう
+  - IPADDRは0.0.0.0でもよい
 
 ```bash
-./lightningd/lightningd --network=testnet --ipaddr <IP address>
+./lightningd/lightningd --network=testnet --ipaddr <IPADDR>:<PORT>
 ```
 
 ## lightning-cli
@@ -138,10 +139,8 @@ rpcpassword=bitcoinpassword
 
 ### 相手ノードへの接続
 
-- `<port>`は、相手が9735以外の場合に指定する
-
 ```
-./cli/lightning-cli connect <node_id> <ip> [<port>]
+./cli/lightning-cli connect <node_id>@<ip>:<port>
 ```
 
 - connect要求したら、相手がpeerリストに現れるのを待つ
