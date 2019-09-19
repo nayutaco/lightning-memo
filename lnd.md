@@ -40,6 +40,21 @@ git pull
 make && make install
 ```
 
+## update golang
+
+golangのバージョンは[docs](https://github.com/lightningnetwork/lnd/blob/master/docs/INSTALL.md#preliminaries)を参照。
+
+```bash
+# ubuntu 18.04
+
+# install
+sudo snap install --channel=1.13/stable --classic go
+
+# update
+sudo snap refresh --channel=1.13/stable --classic go
+
+```
+
 # 設定
 
 ## ~/.lnd/lnd.conf
