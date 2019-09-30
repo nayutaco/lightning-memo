@@ -84,6 +84,9 @@ pytest -v test.py -k 'test_connect[eclair_eclair]'
 
 # ptarmiganの転送関係テストのみ実施
 pytest -v test.py -k 'test_forwarded_payment and ptarmigan'
+
+# ptarmiganのgossip以外
+pytest -v test.py -k '(ptarmigan or PtarmNode) and not test_gossip'
 ```
 
 ## result
