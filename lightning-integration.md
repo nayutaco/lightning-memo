@@ -23,8 +23,18 @@ pip3 install secp256k1
 
 * pythonにmakoというライブラリがいる
 
+c-lightningのビルドに失敗する
+
 ```bash
 pip install mako
+```
+
+* pythonにattrsというライブラリがいる
+
+`TypeError: attrib() got an unexpected keyword argument 'convert'`というエラーが出る
+
+```bash
+pip install attrs==19.1.0
 ```
 
 ## usage
