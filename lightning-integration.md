@@ -123,6 +123,14 @@ pytest -v test.py -k '(ptarmigan or PtarmNode) and not test_gossip'
 +--+---+     +------+     +------+     +--+---+     +------+
 |nodes0+-----+nodes1+-----+nodes2+-----+nodes3+-----+nodes4|
 +------+     +------+     +------+     +------+     +------+
-
-nodes0～4=lightningd create channels and connect node1 and node2.
 ```
+
+1. nodes0～node4はc-lightning、node1はパラメータの前者、node2はパラメータの後者を使う
+2. nodes0～node4は事前にopen_channelする
+3. generate 30
+4. それぞれのnodesが、nodeを5つ、channelを8つ認識するまで待つ(これを書いている時点では最長120秒)
+5. node1はnode0と、node2はnode3(正確には最後から2番目のnode)とconnectする
+6. node1とnode2でそれぞれnodeを5つ認識できればOK
+
+* 6の確認がテストの本体なのだが、それより前でうまく行かないことがしばしばある
+* nodesはchannelの認識を待つけど、node1,2は待たない。これはeclairがlocalのchannelをannounceしないための措置
