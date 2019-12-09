@@ -112,20 +112,17 @@ pytest -v test.py -k '(ptarmigan or PtarmNode) and not test_gossip'
 
 ##
 
-### `$ pytest -v test.py -k 'test_gossip[lightning_ptarmigan]'`
+### `$ pytest -v test.py -k 'test_gossip[FIRST_SECOND]'`
 
 ```
-first=lightningd
-second=ptarmigan
++-----+                                +-----+
+|node1| (FIRST)                        |node2| (SECOND)
++--+--+                                +--+--+
+   |                                      |
+   |                                      |
++--+---+     +------+     +------+     +--+---+     +------+
+|nodes0+-----+nodes1+-----+nodes2+-----+nodes3+-----+nodes4|
++------+     +------+     +------+     +------+     +------+
 
-+-----+                             +-----+
-|node1| (first)                     |node2| (second)
-+--+--+                             +--+--+
-   |                                   |
-   |                                   |
-+--+--+     +-----+     +-----+     +--+--+     +-----+
-|node3+-----+node4+-----+node5+-----+node6+-----+node7|
-+-----+     +-----+     +-----+     +-----+     +-----+
-
-node3～7 create channels and connect node1 and node2.
+nodes0～4=lightningd create channels and connect node1 and node2.
 ```
