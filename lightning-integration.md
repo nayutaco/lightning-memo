@@ -104,7 +104,9 @@ pytest -v test.py -k '(ptarmigan or PtarmNode) and not test_gossip'
 
 ## result
 
-* ログやDBは /tmp/lightning-???? 下に保存される
+* ログやDBは /tmp/lightning-???? 下に保存される。/tmp/ltests-????にも何か保存される
+  * ????は
+  * 全部消したければ`rm -rf /tmp/lightning-* /tmp/ltests-*`
 * 最後に失敗したテストは `<PYTEST DIR>/.pytest_cache/v/cache/lastfailed` に名前が残っている
 
 ## trouble
@@ -137,3 +139,5 @@ pytest -v test.py -k '(ptarmigan or PtarmNode) and not test_gossip'
 
 * 6の確認がテストの本体なのだが、それより前でうまく行かないことがしばしばある
 * nodesはchannelの認識を待つけど、node1,2は待たない。これはeclairがlocalのchannelをannounceしないための措置
+* `/tmp/lightning-????/test_gossip[FIRST_SECOND]/`以下に`node-1`～`node-7`までのディレクトリがある
+  * `node-1`がFIRST、`node-2`がSECOND、`node-3`以降はnodes0～4に対応している
