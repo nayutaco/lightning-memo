@@ -89,6 +89,9 @@ py.test -v test.py
 # ptarmiganの入ったテストのみ実施
 pytest -v test.py -k 'ptarmigan or PtarmNode'
 
+# ptarmiganとlndの入ったテストのみ実施
+pytest -v test.py -k '(ptarmigan or PtarmNode) and lnd'
+
 # 接続(eclair--eclair)のみ実施
 pytest -v test.py -k 'test_connect[eclair_eclair]'
 
