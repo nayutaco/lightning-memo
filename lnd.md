@@ -76,23 +76,37 @@ no-macaroons=true
 nobootstrap=1
 
 [Bitcoin]
+bitcoin.active=1
 bitcoin.node=bitcoind
 bitcoin.testnet=1
 ; bitcoin.regtest=1
-bitcoin.active=1
+
+[Bitcoind]
+bitcoind.rpchost=localhost:18332
+bitcoind.rpcuser=bitcoinusert
+bitcoind.rpcpass=bitcoinpasswordt
+bitcoind.zmqpubrawblock=tcp://127.0.0.1:28332
+bitcoind.zmqpubrawtx=tcp://127.0.0.1:28333
 ```
 
 ~/.bitcoin/bitcoin.conf
 ```text
-rpcuser=bitcoinuser
-rpcpassword=bitcoinpassword
 server=1
 txindex=1
-testnet=1
-#regtest=1
-#rpcport=18443
+
+[testnet]
+rpcuser=bitcoinusert
+rpcpassword=bitcoinpasswordt
+rpcport=18332
 zmqpubrawblock=tcp://127.0.0.1:28332
 zmqpubrawtx=tcp://127.0.0.1:28333
+
+[regtest]
+rpcuser=bitcoinuser
+rpcpassword=bitcoinpassword
+rpcport=18443
+zmqpubrawblock=tcp://127.0.0.1:18445
+zmqpubrawtx=tcp://127.0.0.1:18446
 ```
 
 ### 私が使っている設定(btcd版)
