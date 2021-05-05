@@ -35,24 +35,11 @@
 # update application
 
 ```bash
-cd $GOPATH/src/github.com/lightningnetwork/lnd
-git pull
+mkdir -p $GOPATH/src/github.com/lightningnetwork
+cd $GOPATH/src/github.com/lightningnetwork
+git clone https://github.com/lightningnetwork/lnd.git
+cd lnd
 make && make install
-```
-
-## update golang
-
-golangのバージョンは[docs](https://github.com/lightningnetwork/lnd/blob/master/docs/INSTALL.md#preliminaries)を参照。
-
-```bash
-# ubuntu 18.04
-
-# install
-sudo snap install --channel=1.13/stable --classic go
-
-# update
-sudo snap refresh --channel=1.13/stable --classic go
-
 ```
 
 # 設定
@@ -60,31 +47,20 @@ sudo snap refresh --channel=1.13/stable --classic go
 ## ~/.lnd/lnd.conf
 
 - [サンプル](https://github.com/lightningnetwork/lnd/blob/master/sample-lnd.conf)
-- [`nobootstrap=1`](https://github.com/lightningnetwork/lnd/blob/3036fc01817eedd1821c2945e04c0e79b69a8453/sample-lnd.conf#L96-L99) すると、自動的に他のノードを検索しにいかなくなる
-  - `lncli listpeers` で何も出てこないので、そうなのだろう
-  - `lnd`がどうやってノードを見つけているのかはわかっていない。mDNSか？
-- `no-macaroons`をtrueにした場合、`lncli`にも`-no-macaroons`がいる。
-  - macaroonsを使う場合、mainnet以外なら`lncli`には`--network=xxxx`で種類を指定する必要があるようだ。
 
-### 私が使っている設定(bitcoind版)
+### bitcoind用の設定例
+
+~/.lnd/lnd.conf
 
 ```text
-[Application Options]
-debuglevel=trace
-debughtlc=true
-no-macaroons=true
-nobootstrap=1
-
 [Bitcoin]
-bitcoin.active=1
+bitcoin.active=true
 bitcoin.node=bitcoind
-bitcoin.testnet=1
-; bitcoin.regtest=1
+bitcoin.testnet=true
 
 [Bitcoind]
-bitcoind.rpchost=localhost:18332
-bitcoind.rpcuser=bitcoinusert
-bitcoind.rpcpass=bitcoinpasswordt
+bitcoind.rpcuser=bitcoinusertestnet
+bitcoind.rpcpass=bitcoinpasswordtestnet
 bitcoind.zmqpubrawblock=tcp://127.0.0.1:28332
 bitcoind.zmqpubrawtx=tcp://127.0.0.1:28333
 ```
@@ -95,68 +71,31 @@ server=1
 txindex=1
 
 [testnet]
-rpcuser=bitcoinusert
-rpcpassword=bitcoinpasswordt
+rpcuser=bitcoinusertestnet
+rpcpassword=bitcoinpasswordtestnet
 rpcport=18332
 zmqpubrawblock=tcp://127.0.0.1:28332
 zmqpubrawtx=tcp://127.0.0.1:28333
-
-[regtest]
-rpcuser=bitcoinuser
-rpcpassword=bitcoinpassword
-rpcport=18443
-zmqpubrawblock=tcp://127.0.0.1:18445
-zmqpubrawtx=tcp://127.0.0.1:18446
 ```
 
-### 私が使っている設定(btcd版)
+### neutrino用の設定例
 
-```text:~/.lnd/lnd.conf
-[Application Options]
-debughtlc=true
-maxpendingchannels=10
-no-macaroons=true
-debuglevel=trace
-
-[Bitcoin]
-bitcoin.active=1
-bitcoin.testnet=1
-bitcoin.node=btcd
-```
-
-~/.btcd/btcd.conf
-
-```text:~/.btcd/btcd.conf
-testnet=1
-txindex=1
-rpcuser=nayuta
-rpcpass=nayuta
-```
-
-## ~/.btcctl/btcctl.conf
-
-- 私が使っている設定
-  - rpcuserなどはbtcd.confにあわせる
-
+~/.lnd/lnd.conf
 ```text
-rpcuser=nayuta
-rpcpass=nayuta
+[Bitcoin]
+bitcoin.active=true
+bitcoin.node=neutrino
+bitcoin.testnet=true
+
+[neutrino]
+neutrino.connect=faucet.lightning.community
 ```
 
 ## ~/.lncli/lncli.conf
 
-- そういう設定ファイルは、ありそうで、無い
+- そういう設定ファイルは無い
 
 # 起動
-
-## btcd
-
-- 起動直後はブロックの読み込みに時間がかかっているので、`btcctl`は応答できないかもしれない。待つ。
-
-```bash
-btcd > /dev/null 2>&1 &
-btcctl --testnet getblockcount
-```
 
 ## lnd
 
@@ -185,7 +124,17 @@ lnd --externalip=<IP address>
 
 ## lncli
 
-- 面倒であれば、`.bashrc` に `alias lncli='lncli --no-macaroons'`などとしておくのがよいだろう
+### 基本
+
+networkのデフォルトはmainnetなので、それ以外は引数で指定する。
+
+```bash
+lncli getinfo
+```
+
+```bash
+lncli -n testnet getinfo
+```
 
 ### create / unlock
 
@@ -193,13 +142,13 @@ lnd --externalip=<IP address>
   - `~/.lnd/data` がデフォルトのデータディレクトリなので、新規にしたい場合はこれを削除するとよい
 
 ```bash
-lncli --no-macaroons create
+lncli create
 ```
 
 - 新規でない場合は `unlock`
 
 ```bash
-lncli --no-macaroons unlock
+lncli unlock
 ```
 
 ### 状態確認
@@ -207,19 +156,19 @@ lncli --no-macaroons unlock
 - `getinfo`
 
 ```bash
-lncli --no-macaroons getinfo
+lncli getinfo
 ```
 
 - `listpeers`
 
 ```bash
-lncli --no-macaroons listpeers
+lncli listpeers
 ```
 
 - ` listchannels`
 
 ```bash
-lncli --no-macaroons listchannels
+lncli listchannels
 ```
 
 ### 入金
@@ -228,14 +177,14 @@ lncli --no-macaroons listchannels
   - 私は[このfaucet](https://testnet.manu.backend.hamburg/faucet)をよく使っている
 
 ```bash
-lncli --no-macaroons newaddress np2wkh
+lncli newaddress np2wkh
 ```
 
 - balanceの確認
   `confirmed_balance` に値が入るまで待つ。
 
 ```bash
-lncli --no-macaroons walletbalance
+lncli walletbalance
 ```
 
 ### 相手ノードへの接続
@@ -245,7 +194,7 @@ lncli --no-macaroons walletbalance
 - `lnd`は自動的にpeerを見つけて接続しに行くようだから、`listpeers`で接続されるのを待った方が良いのかもしれない。
 
 ```bash
-lncli --no-macaroons connect <node_id>@<IP address>[:<port>]
+lncli connect <node_id>@<IP address>[:<port>]
 ```
 
 ### チャネル開設
@@ -253,7 +202,7 @@ lncli --no-macaroons connect <node_id>@<IP address>[:<port>]
 - `--local_amt`の単位はsatoshis
 
 ```bash
-lncli --no-macaroons openchannel --node_key=<node_id> --local_amt <amt_satoshi>
+lncli openchannel --node_key=<node_id> --local_amt <amt_satoshi>
 ```
 
 ### チャネル開設状態
@@ -261,7 +210,7 @@ lncli --no-macaroons openchannel --node_key=<node_id> --local_amt <amt_satoshi>
 - 状態の調べ方がよくわからないが、開設できれば`listchannels`に出てくる。
 
 ```bash
-lncli --no-macaroons listchannels
+lncli listchannels
 ```
 
 ### invoiceの作成
@@ -271,39 +220,19 @@ lncli --no-macaroons listchannels
   - 成功すると `"pay_req"`に`ln`で始まる文字列が返ってくる。
 
 ```bash
-lncli --no-macaroons addinvoice --amt 100
+lncli addinvoice --amt 100
 ```
 
 ### invoiceのデコード
 
 ```bash
-lncli --no-macaroons decodepayreq <invoice>
-```
-
-デコード例
-
-```text
-$ lncli --no-macaroons decodepayreq lntb17u1pd8dmetpp5hjewt9hzeywgzj3q6373ncsv
-zc8reqckl76zfzku7tmu7w5d4wzsdpzxysy2umswfjhxum0yppk76twypgxzmnwvypfqvr3cegc6qkck
-9h58yrt56yrfynexpaqhtwujc6s3v5el3g7yrgsy9anxldskmqwwetw32teql70u8tvgc47rkelvtjgz
-mal7x3xcpfwhnf3
-{
-    "destination": "035b55e3e08538afeef6ff9804e3830293eec1c4a6a9570f1e96a478dad1c86fed",
-    "payment_hash": "bcb2e596e2c91c814a20d47d19e20c160e3c8316ffb4248adcf2f7cf3a8dab85",
-    "num_satoshis": "1700",
-    "timestamp": "1517743915",
-    "expiry": "3600",
-    "description": "1 Espresso Coin Panna",
-    "description_hash": "",
-    "fallback_addr": "",
-    "cltv_expiry": "9"
-}
+lncli decodepayreq <invoice>
 ```
 
 ### 送金
 
 ```bash
-lncli --no-macaroons payinvoice <BOLT11 invoice>
+lncli payinvoice <BOLT11 invoice>
 ```
 
 ### チャネル閉鎖
@@ -314,16 +243,126 @@ lncli --no-macaroons payinvoice <BOLT11 invoice>
 * mutual close
 
 ```bash
-lncli --no-macaroons closechannel --funding_txid <funding_txid> [--output_index <funding_txindex>]
+lncli closechannel --funding_txid <funding_txid> [--output_index <funding_txindex>]
 ```
 
 * unilateral close
 
 ```bash
-lncli --no-macaroons closechannel --force --funding_txid <funding_txid> [--output_index <funding_txindex>]
+lncli closechannel --force --funding_txid <funding_txid> [--output_index <funding_txindex>]
 ```
 
 # lncli --help
+
+## v0.12.99-beta(commit-id: 6d661334599ffa2a409ad6b0942328f9fd213d09)
+
+```
+$ lncli --help
+NAME:
+   lncli - control plane for your Lightning Network Daemon (lnd)
+
+USAGE:
+   lncli [global options] command [command options] [arguments...]
+
+VERSION:
+   0.12.99-beta commit=v0.12.0-beta-521-g6d661334-dirty
+
+COMMANDS:
+     getinfo          Returns basic information related to the active daemon.
+     getrecoveryinfo  Display information about an ongoing recovery attempt.
+     debuglevel       Set the debug level.
+     stop             Stop and shutdown the daemon.
+     version          Display lncli and lnd version info.
+     getmccfg         Display mission control's config.
+     setmccfg         Set mission control's config.
+     help, h          Shows a list of commands or help for one command
+   Channels:
+     openchannel        Open a channel to a node or an existing peer.
+     closechannel       Close an existing channel.
+     closeallchannels   Close all existing channels.
+     abandonchannel     Abandons an existing channel.
+     channelbalance     Returns the sum of the total available channel balance across all open channels.
+     pendingchannels    Display information pertaining to pending channels.
+     listchannels       List all open channels.
+     closedchannels     List all closed channels.
+     getnetworkinfo     Get statistical information about the current state of the network.
+     feereport          Display the current fee policies of all active channels.
+     updatechanpolicy   Update the channel policy for all channels, or a single channel.
+     exportchanbackup   Obtain a static channel back up for a selected channels, or all known channels
+     verifychanbackup   Verify an existing channel backup
+     restorechanbackup  Restore an existing single or multi-channel static channel backup
+     updatechanstatus   Set the status of an existing channel on the network.
+   Graph:
+     describegraph   Describe the network graph.
+     getnodemetrics  Get node metrics.
+     getchaninfo     Get the state of a channel.
+     getnodeinfo     Get information on a specific node.
+   Invoices:
+     addinvoice     Add a new invoice.
+     lookupinvoice  Lookup an existing invoice by its payment hash.
+     listinvoices   List all invoices currently stored within the database. Any active debug invoices are ignored.
+     decodepayreq   Decode a payment request.
+   Macaroons:
+     bakemacaroon      Bakes a new macaroon with the provided list of permissions and restrictions.
+     listmacaroonids   List all macaroons root key IDs in use.
+     deletemacaroonid  Delete a specific macaroon ID.
+     listpermissions   Lists all RPC method URIs and the macaroon permissions they require to be invoked.
+     printmacaroon     Print the content of a macaroon in a human readable format.
+   On-chain:
+     estimatefee    Get fee estimates for sending bitcoin on-chain to multiple addresses.
+     sendmany       Send bitcoin on-chain to multiple addresses.
+     sendcoins      Send bitcoin on-chain to an address.
+     listunspent    List utxos available for spending.
+     listchaintxns  List transactions from the wallet.
+   Payments:
+     sendpayment    Send a payment over lightning.
+     payinvoice     Pay an invoice over lightning.
+     sendtoroute    Send a payment over a predefined route.
+     listpayments   List all outgoing payments.
+     queryroutes    Query a route to a destination.
+     fwdinghistory  Query the history of all forwarded HTLCs.
+     trackpayment   Track progress of an existing payment.
+     querymc        Query the internal mission control state.
+     importmc       Import a result to the internal mission control state.
+     queryprob      Estimate a success probability.
+     resetmc        Reset internal mission control state.
+     buildroute     Build a route from a list of hop pubkeys.
+   Peers:
+     connect     Connect to a remote lnd peer.
+     disconnect  Disconnect a remote lnd peer identified by public key.
+     listpeers   List all active, currently connected peers.
+   Profiles:
+     profile  Create and manage lncli profiles
+   Startup:
+     create          Initialize a wallet when starting lnd for the first time.
+     unlock          Unlock an encrypted wallet at startup.
+     changepassword  Change an encrypted wallet's password at startup.
+     state           Get the current state of the wallet and RPC
+   Wallet:
+     newaddress     Generates a new address.
+     walletbalance  Compute and display the wallet's current balance.
+     signmessage    Sign a message with the node's private key.
+     verifymessage  Verify a message signed with the signature.
+   Watchtower:
+     wtclient  Interact with the watchtower client.
+
+GLOBAL OPTIONS:
+   --rpcserver value          The host:port of LN daemon. (default: "localhost:10009")
+   --lnddir value             The path to lnd's base directory. (default: "/home/ec2-user/.lnd")
+   --tlscertpath value        The path to lnd's TLS certificate. (default: "/home/ec2-user/.lnd/tls.cert")
+   --chain value, -c value    The chain lnd is running on, e.g. bitcoin. (default: "bitcoin")
+   --network value, -n value  The network lnd is running on, e.g. mainnet, testnet, etc. (default: "mainnet")
+   --no-macaroons             Disable macaroon authentication.
+   --macaroonpath value       The path to macaroon file.
+   --macaroontimeout value    Anti-replay macaroon validity time in seconds. (default: 60)
+   --macaroonip value         If set, lock macaroon to specific IP address.
+   --profile value, -p value  Instead of reading settings from command line parameters or using the default profile, use a specific profile. If a default profile is set, this flag can be set to an empty string to disable reading values from the profiles file.
+   --macfromjar value         Use this macaroon from the profile's macaroon jar instead of the default one. Can only be used if profiles are defined.
+   --help, -h                 show help
+   --version, -v              print the version
+```
+
+## v0.3
 
 ```
 $ lncli --help
@@ -376,7 +415,7 @@ COMMANDS:
 GLOBAL OPTIONS:
    --rpcserver value        host:port of ln daemon (default: "localhost:10009")
    --tlscertpath value      path to TLS certificate (default: "/home/nayuta/.lnd/tls.cert")
-   --no-macaroons           disable macaroon authentication
+             disable macaroon authentication
    --macaroonpath value     path to macaroon file (default: "/home/nayuta/.lnd/admin.macaroon")
    --macaroontimeout value  anti-replay macaroon validity time in seconds (default: 60)
    --macaroonip value       if set, lock macaroon to specific IP address
@@ -390,21 +429,3 @@ GLOBAL OPTIONS:
 
 - `~/.lnd/logs/` にある
 - ある程度のサイズになるとgzで固められるようだが、3ファイルくらいしか残っていないようである
-
-### 見方
-
-- `lnd`が切断したときの例
-
-```
-2018-02-05 14:12:59.604 [TRC] PEER: Disconnecting 52.243.46.154:55248, reason: didn't receive ChannelReestablish before deadline
-2018-02-05 14:12:59.604 [INF] PEER: unable to read message from 52.243.46.154:55248: read tcp 10.0.0.5:9735->52.243.46.154:55248: use of closed network connection
-2018-02-05 14:12:59.604 [TRC] PEER: writeHandler for peer 52.243.46.154:55248 done
-2018-02-05 14:12:59.604 [TRC] PEER: readHandler for peer 52.243.46.154:55248 done
-2018-02-05 14:12:59.604 [DBG] SRVR: Peer 52.243.46.154:55248 has been disconnected
-2018-02-05 14:12:59.604 [TRC] PEER: Update stream for gossiper exited
-2018-02-05 14:12:59.604 [DBG] FNDG: Cancelling all reservations for peer 0361949de95991cc68bb82bd968a1bac411830590478e1a00d1907a351211f93b2
-2018-02-05 14:12:59.604 [DBG] FNDG: No active reservations for node: 0361949de95991cc68bb82bd968a1bac411830590478e1a00d1907a351211f93b2
-2018-02-05 14:12:59.604 [INF] HSWC: Removing channel link with ChannelID(fc48ddb367b541a1358506f76dd3c2478f3ced335ee5653c0e64af909fcacb2c)
-2018-02-05 14:12:59.604 [INF] HSWC: ChannelLink(2ccbca9f90af640e3c65e55e33ed3c8f47c2d36df7068535a141b567b3dd48fc:0) is stopping
-2018-02-05 14:12:59.604 [DBG] SRVR: removing peer 52.243.46.154:55248
-```
