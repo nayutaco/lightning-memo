@@ -4,10 +4,8 @@
   * [update application](#update-application)
   * [設定](#設定)
     * [~/.lnd/lnd.conf](#lndlndconf)
-    * [~/.btcctl/btcctl.conf](#btcctlbtcctlconf)
-    * [~/.lncli/lncli.conf](#lnclilncliconf)
+    * [lncli.conf](#lncliconf)
   * [起動](#起動)
-    * [btcd](#btcd)
     * [lnd](#lnd)
       * [基本](#基本)
       * [ログレベル指定](#ログレベル指定)
@@ -26,7 +24,6 @@
   * [lncli --help](#lncli---help)
   * [デバッグ](#デバッグ)
     * [log](#log)
-      * [見方](#見方)
 
 # site
 
@@ -91,7 +88,7 @@ bitcoin.testnet=true
 neutrino.connect=faucet.lightning.community
 ```
 
-## ~/.lncli/lncli.conf
+## lncli.conf
 
 - そういう設定ファイルは無い
 
