@@ -83,6 +83,8 @@ zmqpubrawtx=tcp://127.0.0.1:28333
 
 ### neutrino用の設定例
 
+`neutrino.connect`にはどこか指定しないといけないのか？
+
 ~/.lnd/lnd.conf
 ```text
 [Bitcoin]
