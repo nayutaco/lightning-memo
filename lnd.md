@@ -148,6 +148,10 @@ lncli -n testnet getinfo
 lncli create
 ```
 
+作成後に[24単語のパスフレーズ](https://github.com/lightningnetwork/lnd/blob/master/docs/recovery.md#24-word-cipher-seeds)が出力される。  
+これはazseed形式で、BIP-39とは互換性がないので注意が必要である。  
+復元したい場合は、`lncli create`で"Do you have an existing cipher seed mnemonic you want to use?"という質問が出たときにYESとこたえるとよい。
+
 - 新規でない場合は `unlock`
 
 ```bash
