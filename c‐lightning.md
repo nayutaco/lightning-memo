@@ -195,133 +195,295 @@ rpcpassword=bitcoinpassword
 
 # lightning-cli help
 
+`basedon-v0.10.1`
+
 ```
-./cli/lightning-cli help
-dev-blockheight
-    Show current block height
+=== bitcoin ===
 
-dev-setfees
-    Set feerate in satoshi-per-kw for {immediate}, {normal} and {slow} (each is optional, when set, separate by spaces) and show the value of those three feerates
+feerates style
+    Return feerate estimates, either satoshi-per-kw ({style} perkw) or satoshi-per-kb ({style} perkb).
 
-connect
+fundpsbt satoshi feerate startweight [minconf] [reserve] [locktime] [min_witness_weight] [excess_as_change]
+    Create PSBT using enough utxos to allow an output of {satoshi} at {feerate}
+
+newaddr [addresstype]
+    Get a new {bech32, p2sh-segwit} (or all) address to fund a channel (default is bech32)
+
+parsefeerate feerate
+    Return current feerate in perkw + perkb for given feerate string.
+
+reserveinputs psbt [exclusive] [reserve]
+    Reserve utxos (or increase their reservation)
+
+sendpsbt psbt [reserve]
+    Finalize, extract and send a PSBT.
+
+signpsbt psbt [signonly]
+    Sign this wallet's inputs on a provided PSBT.
+
+unreserveinputs psbt [reserve]
+    Unreserve utxos (or at least, reduce their reservation)
+
+utxopsbt satoshi feerate startweight utxos [reserve] [reservedok] [locktime] [min_witness_weight] [excess_as_change]
+    Create PSBT using these utxos
+
+=== channels ===
+
+close id [unilateraltimeout] [destination] [fee_negotiation_step] [wrong_funding] [force_lease_closed]
+    Close the channel with {id} (either peer ID, channel ID, or short channel ID). Force a unilateral close after {unilateraltimeout} seconds (default 48h). If {destination} address is provided, will be used as output address.
+
+fundchannel_cancel id
+    Cancel inflight channel establishment with peer {id}.
+
+fundchannel_complete id psbt
+    Complete channel establishment with peer {id} for funding transactionwith {psbt}. Returns true on success, false otherwise.
+
+fundchannel_start id amount [feerate] [announce] [close_to] [push_msat]
+    Start fund channel with {id} using {amount} satoshis. Returns a bech32 address to use as an output for a funding transaction.
+
+listforwards [in_channel] [out_channel] [status]
+    List all forwarded payments and their information optionally filtering by [in_channel] [out_channel] and [state]
+
+openchannel_abort channel_id
+    Abort {channel_id}'s open. Usable while `commitment_signed=false`.
+
+openchannel_bump channel_id amount initialpsbt [funding_feerate]
+    Attempt to bump the fee on {channel_id}'s funding transaction.
+
+openchannel_init id amount initialpsbt [commitment_feerate] [funding_feerate] [announce] [close_to] [request_amt] [compact_lease]
+    Init an open channel to {id} with {initialpsbt} for {amount} satoshis. Returns updated {psbt} with (partial) contributions from peer
+
+openchannel_signed channel_id signed_psbt
+    Send our {signed_psbt}'s tx sigs for {channel_id}.
+
+openchannel_update channel_id psbt
+    Update {channel_id} with {psbt}. Returns updated {psbt} with (partial) contributions from peer. If {commitments_secured} is true, next call should be to openchannel_signed
+
+setchannelfee id [base] [ppm]
+    Sets specific routing fees for channel with {id} (either peer ID, channel ID, short channel ID or 'all'). Routing fees are defined by a fixed {base} (msat) and a {ppm} (proportional per millionth) value. If values for {base} or {ppm} are left out, defaults will be used. {base} can also be defined in other units, for example '1sat'. If {id} is 'all', the fees will be applied for all channels.
+
+setleaserates lease_fee_base_msat lease_fee_basis funding_weight channel_fee_max_base_msat channel_fee_max_proportional_thousandths
+    Called by plugin to set the node's present channel lease rates. Not to be set without having a plugin which can handle `openchannel2` hooks.
+
+=== network ===
+
+connect id [host] [port]
     Connect to {id} at {host} (which can end in ':port' if not default). {id} can also be of the form id@host
 
-listnodes
-    Show node {id} (or all, if no {id}), in our local network view
+disconnect id [force]
+    Disconnect from {id} that has previously been connected to using connect; with {force} set, even if it has a current channel
 
-getroute
-    Show route to {id} for {msatoshi}, using {riskfactor} and optional {cltv} (default 9). If specified search from {fromid} otherwise use this node as source. Randomize the route with up to {fuzzpercent} (0.0 -> 100.0, default 5.0) using {seed} as an arbitrary-size string seed.
+listpeers [id] [level]
+    Show current peers, if {level} is set, include logs for {id}
 
-listchannels
-    Show channel {short_channel_id} (or all known channels, if no {short_channel_id})
+ping id [len] [pongbytes]
+    Send peer {id} a ping of length {len} (default 128) asking for {pongbytes} (default 128)
 
-invoice
-    Create an invoice for {msatoshi} with {label} and {description} with optional {expiry} seconds (default 1 hour)
+=== payment ===
 
-listinvoice
-    (DEPRECATED) Show invoice {label} (or all, if no {label}))
+createinvoice invstring label preimage
+    Lowlevel command to sign and create invoice {invstring}, resolved with {preimage}, using unique {label}.
 
-listinvoices
-    Show invoice {label} (or all, if no {label})
+createinvoicerequest bolt12 [recurrence_label]
+    Create and sign an invoice_request {bolt12}, with {recurrence_label} if recurring, filling in payer_info and payer_key.
 
-delinvoice
-    Delete unpaid invoice {label} with {status}
+createoffer bolt12 [label] [single_use]
+    Create and sign an offer {bolt12} with and optional {label}.
 
-delexpiredinvoice
-    Delete all expired invoices that expired as of given {maxexpirytime} (a UNIX epoch time), or all expired invoices if not specified
+createonion hops assocdata [session_key] [onion_size]
+    Create an onion going through the provided nodes, each with its own payload
 
-autocleaninvoice
-    Set up autoclean of expired invoices. Perform cleanup every {cycle_seconds} (default 3600), or disable autoclean if 0. Clean up expired invoices that have expired for {expired_by} seconds (default 86400).
-
-waitanyinvoice
-    Wait for the next invoice to be paid, after {lastpay_index} (if supplied)
-
-waitinvoice
-    Wait for an incoming payment matching the invoice with {label}, or if the invoice expires
-
-decodepay
+decodepay bolt11 [description]
     Decode {bolt11}, using {description} if necessary
 
-help
-    List available commands, or give verbose help on one command.
+delexpiredinvoice [maxexpirytime]
+    Delete all expired invoices that expired as of given {maxexpirytime} (a UNIX epoch time), or all expired invoices if not specified
 
-stop
-    Shut down the lightningd process
+delinvoice label status
+    Delete unpaid invoice {label} with {status}
 
-dev-rhash
-    Show SHA256 of {secret}
+delpay payment_hash status
+    Delete payment with {payment_hash} and {status}
 
-dev-crash
-    Crash lightningd by calling fatal()
+disableoffer offer_id
+    Disable offer {offer_id}
+
+invoice msatoshi label description [expiry] [fallbacks] [preimage] [exposeprivatechannels] [cltv]
+    Create an invoice for {msatoshi} with {label} and {description} with optional {expiry} seconds (default 1 week), optional {fallbacks} address list(default empty list) and optional {preimage} (default autogenerated)
+
+listinvoices [label] [invstring] [payment_hash] [offer_id]
+    Show invoice matching {label}, {invstring}, {payment_hash} or {offerid} (or all, if no query parameter specified)
+
+listoffers [offer_id] [active_only]
+    If {offer_id} is set, show that. Otherwise, if {showdisabled} is true, list all, otherwise just non-disabled ones.
+
+listsendpays [bolt11] [payment_hash]
+    Show sendpay, old and current, optionally limiting to {bolt11} or {payment_hash}.
+
+listtransactions
+    List transactions that we stored in the wallet
+
+payersign messagename fieldname merkle tweak
+    Sign {messagename} {fieldname} {merkle} (a 32-byte hex string) using public {tweak}
+
+sendonion onion first_hop payment_hash [label] [shared_secrets] [partid] [bolt11] [msatoshi] [destination] [localofferid]
+    Send a payment with a pre-computed onion.
+
+sendpay route payment_hash [label] [msatoshi] [bolt11] [payment_secret] [partid] [localofferid]
+    Send along {route} in return for preimage of {payment_hash}
+
+waitanyinvoice [lastpay_index] [timeout]
+    Wait for the next invoice to be paid, after {lastpay_index} (if supplied).  If {timeout} seconds is reached while waiting, fail with an error.
+
+waitinvoice label
+    Wait for an incoming payment matching the invoice with {label}, or if the invoice expires
+
+waitsendpay payment_hash [timeout] [partid]
+    Wait for payment attempt on {payment_hash} to succeed or fail, but only up to {timeout} seconds.
+
+=== plugin ===
+
+autocleaninvoice [cycle_seconds] [expired_by]
+    Set up autoclean of expired invoices.
+
+decode string
+    Decode {string} message, returning {type} and information.
+
+estimatefees
+    Get the urgent, normal and slow Bitcoin feerates as sat/kVB.
+
+fundchannel id amount [feerate] [announce] [minconf] [utxos] [push_msat] [close_to] [request_amt] [compact_lease]
+    Fund channel with {id} using {amount} (or 'all'), at optional {feerate}. Only use outputs that have {minconf} confirmations.
+
+funderupdate [policy] [policy_mod] [leases_only] [min_their_funding_msat] [max_their_funding_msat] [per_channel_min_msat] [per_channel_max_msat] [reserve_tank_msat] [fuzz_percent] [fund_probability] [lease_fee_base_msat] [lease_fee_basis] [funding_weight] [channel_fee_max_base_msat] [channel_fee_max_proportional_thousandths]
+    Configuration for dual-funding settings.
+
+getchaininfo
+    Get the chain id, the header count, the block count, and whether this is IBD.
+
+getrawblockbyheight height
+    Get the bitcoin block at a given height
+
+getroute id msatoshi riskfactor [cltv] [fromid] [fuzzpercent] [exclude] [maxhops]
+    Primitive route command
+
+getutxout txid vout
+    Get information about an output, identified by a {txid} an a {vout}
+
+keysend destination msatoshi [label] [maxfeepercent] [retry_for] [maxdelay] [exemptfee] [routehints]
+    Send a payment without an invoice to a node
+
+legacypay bolt11 [msatoshi] [label] [riskfactor] [maxfeepercent] [retry_for] [maxdelay] [exemptfee]
+    Send payment specified by {bolt11} with {amount}
+
+listchannels [short_channel_id] [source] [destination]
+    List all known channels in the network
+
+listincoming
+    List the channels incoming from our direct peers
+
+listnodes [id]
+    List all known nodes in the network
+
+listpays [bolt11] [payment_hash]
+    List result of payment {bolt11} or {payment_hash}, or all
+
+multifundchannel destinations [feerate] [minconf] [utxos] [minchannels] [commitment_feerate]
+    Fund channels to {destinations}, which is an array of objects containing peer {id}, {amount}, and optional {announce} and {push_msat}.  A single transaction will be used to fund all the channels.  Use {feerate} for the transaction, select outputs that are buried {minconf} blocks deep, or specify a set of {utxos}.
+
+multiwithdraw outputs [feerate] [minconf] [utxos]
+    Send to multiple {outputs} via a single Bitcoin transaction.
+
+offer amount description [vendor] [label] [quantity_min] [quantity_max] [absolute_expiry] [recurrence] [recurrence_base] [recurrence_paywindow] [recurrence_limit] [single_use]
+    Create an offer to accept money
+
+offerout amount description [vendor] [label] [absolute_expiry] [refund_for]
+    Create an offer to send money
+
+pay bolt11 [msatoshi] [label] [riskfactor] [maxfeepercent] [retry_for] [maxdelay] [exemptfee] [localofferid]
+    Send payment specified by {bolt11}
+
+paystatus [bolt11]
+    Detail status of attempts to pay {bolt11}, or all
+
+plugin subcommand=start|stop|startdir|rescan|list
+    Control plugins (start, stop, startdir, rescan, list)
+
+sendrawtransaction tx allowhighfees
+    Send a raw transaction to the Bitcoin network.
+
+txdiscard txid
+    Discard a transaction created by txprepare
+
+txprepare outputs [feerate] [minconf] [utxos]
+    Create a transaction, with option to spend in future (either txsend and txdiscard)
+
+txsend txid
+    Send a transaction created by txprepare
+
+withdraw destination satoshi [feerate] [minconf] [utxos]
+    Send funds to {destination} address
+
+=== utility ===
+
+addgossip message
+    Inject gossip {message} into gossipd
+
+check command_to_check
+    Don't run {command_to_check}, just verify parameters.
+
+checkmessage message zbase [pubkey]
+    Verify a digital signature {zbase} of {message} signed with {pubkey}
+
+dev-sendcustommsg node_id msg
+    Send a custom message to the peer with the given {node_id}
 
 getinfo
     Show information about this node
 
-getlog
+getlog [level]
     Show logs, with optional log {level} (info|unusual|debug|io)
 
-fundchannel
-    Fund channel with {id} using {satoshi} satoshis
+getsharedsecret point
+    Compute the hash of the Elliptic Curve Diffie Hellman shared secret point from this node private key and an input {point}.
 
-listconfigs
+help [command]
+    List available commands, or give verbose help on one {command}.
+
+listconfigs [config]
     List all configuration options, or with [config], just that one.
 
-sendpay
-    Send along {route} in return for preimage of {payment_hash}
-
-waitsendpay
-    Wait for payment attempt on {payment_hash} to succeed or fail, but only up to {timeout} seconds.
-
-listpayments
-    Show outgoing payments
-
-pay
-    Send payment specified by {bolt11} with optional {msatoshi} (if and only if {bolt11} does not have amount), {description} (required if {bolt11} uses description hash), {riskfactor} (default 1.0), {maxfeepercent} (default 0.5) the maximum acceptable fee as a percentage (e.g. 0.5 => 0.5%), and {retry_for} (default 60) the integer number of seconds before we stop retrying
-
-listpeers
-    Show current peers, if {level} is set, include logs for {id}
-
-close
-    Close the channel with peer {id}
-
-disconnect
-    Disconnect from {id} that has previously been connected to using connect
-
-dev-sign-last-tx
-    Sign and show the last commitment transaction with peer {id}
-
-dev-fail
-    Fail with peer {id}
-
-dev-reenable-commit
-    Re-enable the commit timer on peer {id}
-
-dev-forget-channel
-    Forget the channel with peer {id}, ignore UTXO check with {force}='true'.
-
-dev-ping
-    Send {peerid} a ping of length {len} asking for {pongbytes}
-
-dev-memdump
-    Show memory objects currently in use
-
-dev-memleak
-    Show unreferenced memory objects
-
-withdraw
-    Send to {destination} address {satoshi} (or 'all') amount via Bitcoin transaction
-
-newaddr
-    Get a new {bech32, p2sh-segwit} address to fund a channel
-
-dev-listaddrs
-    Show addresses list up to derivation {index} (default is the last bip32 index)
-
-listfunds
+listfunds [spent]
     Show available funds from the internal wallet
+
+notifications enable
+    Enable notifications for {level} (or 'false' to disable)
+
+sendcustommsg node_id msg
+    Send a custom message to the peer with the given {node_id}
+
+sendonionmessage hops [reply_path]
+    Send message over {hops} (id, [short_channel_id], [blinding], [enctlv], [invoice], [invoice_request], [invoice_error], [rawtlv]) with optional {reply_path} (blinding, path[id, enctlv])
+
+signmessage message
+    Create a digital signature of {message}
+
+stop
+    Shut down the lightningd process
+
+waitblockheight blockheight [timeout]
+    Wait for the blockchain to reach {blockheight}, up to {timeout} seconds.
+
+=== developer ===
+
+dev-listaddrs [bip32_max_index]
+    Show addresses list up to derivation {index} (default is the last bip32 index)
 
 dev-rescan-outputs
     Synchronize the state of our funds with bitcoind
+
+---
+run `lightning-cli help <command>` for more information on a specific command
 ```
 
 # devel
