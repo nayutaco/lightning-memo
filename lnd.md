@@ -263,10 +263,10 @@ lncli closechannel --force --funding_txid <funding_txid> [--output_index <fundin
 
 # lncli --help
 
-## v0.12.99-beta(commit-id: 6d661334599ffa2a409ad6b0942328f9fd213d09)
+## 0.13.3-beta
 
 ```
-$ lncli --help
+$ lncli
 NAME:
    lncli - control plane for your Lightning Network Daemon (lnd)
 
@@ -274,7 +274,7 @@ USAGE:
    lncli [global options] command [command options] [arguments...]
 
 VERSION:
-   0.12.99-beta commit=v0.12.0-beta-521-g6d661334-dirty
+   0.13.3-beta commit=v0.13.3-beta
 
 COMMANDS:
      getinfo          Returns basic information related to the active daemon.
@@ -285,6 +285,8 @@ COMMANDS:
      getmccfg         Display mission control's config.
      setmccfg         Set mission control's config.
      help, h          Shows a list of commands or help for one command
+   Autopilot:
+     autopilot  Interact with a running autopilot.
    Channels:
      openchannel        Open a channel to a node or an existing peer.
      closechannel       Close an existing channel.
@@ -307,10 +309,13 @@ COMMANDS:
      getchaninfo     Get the state of a channel.
      getnodeinfo     Get information on a specific node.
    Invoices:
-     addinvoice     Add a new invoice.
-     lookupinvoice  Lookup an existing invoice by its payment hash.
-     listinvoices   List all invoices currently stored within the database. Any active debug invoices are ignored.
-     decodepayreq   Decode a payment request.
+     addinvoice      Add a new invoice.
+     lookupinvoice   Lookup an existing invoice by its payment hash.
+     listinvoices    List all invoices currently stored within the database. Any active debug invoices are ignored.
+     decodepayreq    Decode a payment request.
+     cancelinvoice   Cancels a (hold) invoice
+     addholdinvoice  Add a new hold invoice.
+     settleinvoice   Reveal a preimage and use it to settle the corresponding invoice.
    Macaroons:
      bakemacaroon      Bakes a new macaroon with the provided list of permissions and restrictions.
      listmacaroonids   List all macaroons root key IDs in use.
@@ -352,13 +357,15 @@ COMMANDS:
      walletbalance  Compute and display the wallet's current balance.
      signmessage    Sign a message with the node's private key.
      verifymessage  Verify a message signed with the signature.
+     wallet         Interact with the wallet.
    Watchtower:
+     tower     Interact with the watchtower.
      wtclient  Interact with the watchtower client.
 
 GLOBAL OPTIONS:
    --rpcserver value          The host:port of LN daemon. (default: "localhost:10009")
-   --lnddir value             The path to lnd's base directory. (default: "/home/ec2-user/.lnd")
-   --tlscertpath value        The path to lnd's TLS certificate. (default: "/home/ec2-user/.lnd/tls.cert")
+   --lnddir value             The path to lnd's base directory. (default: "/home/ubuntu/.lnd")
+   --tlscertpath value        The path to lnd's TLS certificate. (default: "/home/ubuntu/.lnd/tls.cert")
    --chain value, -c value    The chain lnd is running on, e.g. bitcoin. (default: "bitcoin")
    --network value, -n value  The network lnd is running on, e.g. mainnet, testnet, etc. (default: "mainnet")
    --no-macaroons             Disable macaroon authentication.
