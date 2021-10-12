@@ -26,7 +26,7 @@
         - [送金](#送金)
         - [チャネル閉鎖](#チャネル閉鎖)
 - [lncli --help](#lncli---help)
-    - [v0.12.99-beta(commit-id: 6d661334599ffa2a409ad6b0942328f9fd213d09)](#v01299-betacommit-id-6d661334599ffa2a409ad6b0942328f9fd213d09)
+    - [0.13.3-beta)](#0.13.3-beta)
     - [v0.3](#v03)
 - [デバッグ](#デバッグ)
     - [log](#log)
