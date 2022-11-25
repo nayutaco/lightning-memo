@@ -21,6 +21,13 @@
 
 * [ACINQ/eclair](https://github.com/ACINQ/eclair)
 
+## usage
+
+このページ自体はv0.2時代の内容になっていてパラメータが現在と異なっています。  
+今の仕様はこちらを確認してください。
+
+2022/11/25 : [usage](https://github.com/ACINQ/eclair/blob/master/docs/Usage.md)
+
 # build
 
 * mavenのバージョンは3.5.4以上
