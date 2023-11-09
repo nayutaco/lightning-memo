@@ -19,7 +19,7 @@
       * [invoice作成](#invoice作成)
       * [送金](#送金)
       * [チャネル閉鎖](#チャネル閉鎖)
-  * [lightningd help](#lightnind-help)
+  * [lightningd help](#lightningd-help)
   * [lightning-cli help](#lightning-cli-help)
   * [devel](#devel)
 
