@@ -1,4 +1,6 @@
-# Table of Contents
+# Core Lightning
+
+## Table of Contents
 
   * [site](#site)
   * [update application](#update-application)
@@ -23,104 +25,113 @@
   * [lightning-cli help](#lightning-cli-help)
   * [devel](#devel)
 
-# site
+## site
 
 - [ElementsProject/lightning](https://github.com/ElementsProject/lightning)
 
-# update application
+## update application
 
 ```bash
-git pull
+git 
 make
 ```
 
-# 設定
+## 設定
 
-## lightningd
-
-- 特になし
-- `~/.lightningd/` に自動生成される
-  - やり直したいときは `~/./lightningd`自体を削除すればよい
-    - node_idを維持したい場合は、`~/./lightningd/lightningd.sqlite3`ファイルだけ削除する
-
-## ~/.bitcoin/bitcoin.conf
+### ~/.bitcoin/bitcoin.conf
 
 - 私が使っている設定
   - rpcuser/rpcpasswordはこの値でなくてもよいが、設定は必要
+  - `txindex`は不要
+  - ZeroMQは使用しない
 
 ```text
 testnet=1
 server=1
-txindex=1
 rpcuser=bitcoinuser
 rpcpassword=bitcoinpassword
 ```
 
-# 起動
+### lightningd
 
-## bitcoind
+- 設定ファイル名は `config` で以下の順に参照される。
+  - `~/.lightningd/config`
+  - `~/.lightningd/<NETWORK_NAME>/config`
+    - `NETWORK_NAME`: `bitcoin`, `testnet`, `signet`, `regtest`
+    - この直下に置く場合は`config`に`network`の設定を書かない。
+- 実行後にデータは `~/.lightningd/<NETWORK_NAME>` に保存される
+  - やり直したいときは `~/./lightningd`自体を削除すればよい
+    - node_idを維持したい場合は、`~/lightningd.sqlite3`ファイルだけ削除する
 
-- 普通に起動すればよい
-- `lightningd`が`~/.bitcoin/bitcoin.conf`を見に行くので、起動しているbitcoindと不一致がないようにする
-  - 動いているbitcoindがregtestで、bitcoin.confがtestnetになっている、など
-
-## lightningd
-
-### 基本
-
-```bash
-./lightningd/lightningd --network=testnet
+```text
+network=regtest
+bitcoin-rpcuser=bitcoinuser
+bitcoin-rpcpassword=bitcoinpassword
+bitcoin-rpcconnect=127.0.0.1
+bitcoin-rpcport=18443
 ```
 
-### ログレベル指定
+## 起動
+
+### bitcoind
+
+- 普通に起動すればよい
+
+### lightningd
+
+#### 基本
+
+```bash
+lightningd --network=testnet
+```
+
+#### ログレベル指定
 
 - `io, debug, info, unusual, broken`
 
 ```bash
-./lightningd/lightningd --network=testnet --log-level=debug
+lightningd --network=testnet --log-level=debug
 ```
 
-### announcementするIPアドレス指定
+#### announcementするIPアドレス指定
 
 - 指定しない場合に`node_announcement`のIPアドレスが未指定になるかどうかは未確認
   - `getinfo`に出てこないので、たぶん未指定になるだろう
   - IPADDRは0.0.0.0でもよい
 
 ```bash
-./lightningd/lightningd --network=testnet --ipaddr <IPADDR>:<PORT>
+lightningd --network=testnet --ipaddr <IPADDR>:<PORT>
 ```
 
-## lightning-cli
+### lightning-cli
 
-- 出力を見やすくするために`jq`しているが、なくてもよい
-
-### 状態確認
+#### 状態確認
 
 - `getinfo`
 
 ```bash
-./cli/lightning-cli getinfo | jq
+lightning-cli getinfo
 ```
 
 - `listpeers`
 
 ```bash
-./cli/lightning-cli listpeers | jq
+lightning-cli listpeers
 ```
 
 - `listchannels`
 
 ```bash
-./cli/lightning-cli listchannels | jq
+lightning-cli listchannels
 ```
 
 - `listnodes`
 
 ```bash
-./cli/lightning-cli listnodes | jq
+lightning-cli listnodes
 ```
 
-### 入金
+#### 入金
 
 - walletにbalanceがない場合は、`lightning-cli`でアドレスを取得し、どこかから入金してもらう
   - `bitcoin-cli sendtoaddress <address> <amount BTC>`かfaucetになるだろう
@@ -128,73 +139,73 @@ rpcpassword=bitcoinpassword
     - 私は[このfaucet](https://testnet.manu.backend.hamburg/faucet)をよく使っている
 
 ```bash
-./cli/lightning-cli newaddr
+lightning-cli newaddr
 ```
 
 - 送金したら、`listfunds`の`outputs`に現れるまでしばらく待つ
-  - コマンドを何度も実行するのが面倒だったら、`watch -n 30 ./cli/lightning-cli listfunds`などとしておくとよいだろう
+  - コマンドを何度も実行するのが面倒だったら、`watch -n 30 lightning-cli listfunds`などとしておくとよいだろう
 
 ```
-./cli/lightning-cli listfunds
+lightning-cli listfunds
 ```
 
-### 相手ノードへの接続
+#### 相手ノードへの接続
 
 ```
-./cli/lightning-cli connect <node_id>@<ip>:<port>
+lightning-cli connect <node_id>@<ip>:<port>
 ```
 
 - connect要求したら、相手がpeerリストに現れるのを待つ
   - 表示されるまでに時間がかかることがある(announcementが多いため？)
 
 ```
-./cli/lightning-cli listpeers | jq
+lightning-cli listpeers
 ```
 
-### チャネル開設
+#### チャネル開設
 
 - connectが成功したら、`fundchannel`でチャネル開設開始
   - `amount`の単位はsatoshi
 
 ```
-./cli/lightning-cli fundchannel <node_id> <amount>
+lightning-cli fundchannel <node_id> <amount>
 ```
 
 - fundchannel要求したら、stateが`CHANNELD_AWAITING_LOCKIN`から`CHANNELD_NORMAL`に変化するまで待つ
 
 ```
-./cli/lightning-cli listpeers | jq
+lightning-cli listpeers
 ```
 
-### invoice作成
+#### invoice作成
 
 - amount_msatの単位はmsatoshi
 - labelとdescriptionは目印程度なので、あまり考えなくて良い
   - descriptionは、BOLT11形式のinvoiceに文字列(purpose of payment(ASCII))として載る
 
 ```
-./cli/lightning-cli invoice <amount_msat> <label> <description>
+lightning-cli invoice <amount_msat> <label> <description>
 ```
 
-### 送金
+#### 送金
 
 ```
-./cli/lightning-cli pay <BOLT11 invoice>
+lightning-cli pay <BOLT11 invoice>
 ```
 
-### チャネル閉鎖
+#### チャネル閉鎖
 
 ```
-# mutual close
-./cli/lightning-cli close <peer node_id>
+## mutual close
+lightning-cli close <peer node_id>
 ```
 
 ```
-# unilateral close
-./cli/lightning-cli close <peer node_id> true
+## unilateral close
+lightning-cli close <peer node_id> true
 ```
 
-### lightningd help
+#### lightningd help
 
 `v23.08.1`
 
@@ -352,7 +363,7 @@ $ ./lightningd --help | grep -e "--dev"
 --dev-sqlfilename <arg>                           Use on-disk sqlite3 file instead of in memory (e.g.
 ```
 
-### lightning-cli help
+#### lightning-cli help
 
 `v23.08.1`
 
@@ -785,7 +796,7 @@ dev-rescan-outputs
 run `lightning-cli help <command>` for more information on a specific command
 ```
 
-### devel
+#### devel
 
 * `update_fulfill_htlc`を送信させない
   * [issue 366](https://github.com/ElementsProject/lightning/issues/366#issuecomment-346249070)
