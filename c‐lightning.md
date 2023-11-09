@@ -64,11 +64,11 @@ rpcpassword=bitcoinpassword
     - node_idを維持したい場合は、`~/lightningd.sqlite3`ファイルだけ削除する
 
 ```text
-network=regtest
+network=testnet
 bitcoin-rpcuser=bitcoinuser
 bitcoin-rpcpassword=bitcoinpassword
 bitcoin-rpcconnect=127.0.0.1
-bitcoin-rpcport=18443
+bitcoin-rpcport=18332
 ```
 
 ## 起動
@@ -83,24 +83,6 @@ bitcoin-rpcport=18443
 
 ```bash
 lightningd --network=testnet
-```
-
-#### ログレベル指定
-
-- `io, debug, info, unusual, broken`
-
-```bash
-lightningd --network=testnet --log-level=debug
-```
-
-#### announcementするIPアドレス指定
-
-- 指定しない場合に`node_announcement`のIPアドレスが未指定になるかどうかは未確認
-  - `getinfo`に出てこないので、たぶん未指定になるだろう
-  - IPADDRは0.0.0.0でもよい
-
-```bash
-lightningd --network=testnet --ipaddr <IPADDR>:<PORT>
 ```
 
 ### lightning-cli
