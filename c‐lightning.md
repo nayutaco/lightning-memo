@@ -317,6 +317,41 @@ A bitcoin lightning daemon (default values shown for network: regtest).
 --bookkeeper-db <arg>                             Location of the bookkeeper database
 ```
 
+`configure --enable-developer`を付けると開発者モードでビルドされる。
+
+```text
+$ ./lightningd --help | grep -e "--dev"
+--dev-debugger=<subprocess>                       Invoke gdb at start of <subprocess>
+--dev-no-plugin-checksum                          Don't checksum plugins to detect changes
+--dev-builtin-plugins-unimportant                 Make builtin plugins unimportant so you can plugin stop
+--dev-no-reconnect                                Disable automatic reconnect-attempts by this node, but
+--dev-fast-reconnect                              Make max default reconnect delay 3 (not 300) seconds
+--dev-disconnect=<filename>                       File containing disconnection points
+--dev-allow-localhost                             Announce and allow announcments for localhost address
+--dev-bitcoind-poll <arg>                         Time between polling for new transactions (default: 30)
+--dev-fast-gossip                                 Make gossip broadcast 1 second, etc
+--dev-fast-gossip-prune                           Make gossip pruning 30 seconds
+--dev-gossip-time <arg>                           UNIX time to override gossipd to use. (default: 0)
+--dev-force-privkey <arg>                         Force HSM to use this as node private key
+--dev-force-bip32-seed <arg>                      Force HSM to use this as bip32 seed
+--dev-force-channel-secrets <arg>                 Force HSM to use these for all per-channel secrets
+--dev-max-funding-unconfirmed-blocks <arg>        Maximum number of blocks we wait for a channel funding
+--dev-force-tmp-channel-id <arg>                  Force the temporary channel id, instead of random
+--dev-no-htlc-timeout                             Don't kill channeld if HTLCs not confirmed within 30 seconds
+--dev-fail-process-onionpacket                    Force all processing of onion packets to fail
+--dev-no-version-checks                           Skip calling subdaemons with --version on startup
+--dev-force-features <arg>                        Force the init/globalinit/node_announce/channel/bolt11/
+--dev-timeout-secs <arg>                          Seconds to timeout if we don't receive INIT from peer
+--dev-no-modern-onion                             Ignore modern onion messages
+--dev-disable-commit-after <arg>                  Disable commit timer after this many commits (default: -1)
+--dev-no-ping-timer                               Don't hang up if we don't get a ping response
+--dev-onion-reply-length <arg>                    Send onion errors of custom length (default: 256)
+--dev-max-fee-multiplier <arg>                    Allow the fee proposed by the remote end to be up to
+--dev-allowdustreserve <arg>                      If true, we allow the `fundchannel` RPC command and the
+--dev-no-fake-fees <arg>                          Suppress fee faking for regtest
+--dev-sqlfilename <arg>                           Use on-disk sqlite3 file instead of in memory (e.g.
+```
+
 ### lightning-cli help
 
 `v23.08.1`
