@@ -19,6 +19,7 @@
       * [invoice作成](#invoice作成)
       * [送金](#送金)
       * [チャネル閉鎖](#チャネル閉鎖)
+  * [lightningd help](#lightnind-help)
   * [lightning-cli help](#lightning-cli-help)
   * [devel](#devel)
 
@@ -191,6 +192,129 @@ rpcpassword=bitcoinpassword
 ```
 # unilateral close
 ./cli/lightning-cli close <peer node_id> true
+```
+
+### lightningd help
+
+`v23.08.1`
+
+```text
+Usage: lightningd 
+A bitcoin lightning daemon (default values shown for network: regtest).
+--list-features-only                              List the features configured, and exit immediately
+--conf=<file>                                     Specify configuration file
+--lightning-dir=<dir>                             Set base directory: network-specific subdirectory is under here (default: "/home/ueno/.lightning")
+--network <arg>                                   Select the network parameters (bitcoin, testnet, signet, regtest, litecoin or litecoin-testnet) (default: regtest)
+--testnet                                         Alias for --network=testnet
+--signet                                          Alias for --network=signet
+--mainnet                                         Alias for --network=bitcoin
+--regtest                                         Alias for --network=regtest
+--version|-V                                      Print version and exit
+--rpc-file <arg>                                  Set JSON-RPC socket (or /dev/tty) (default: "lightning-rpc")
+--test-daemons-only                               Test that subdaemons can be run, then exit immediately
+--allow-deprecated-apis <arg>                     Enable deprecated options, JSONRPC commands, fields, etc. (default: true)
+--plugin <arg>                                    Add a plugin to be run (can be used multiple times)
+--plugin-dir <arg>                                Add a directory to load plugins from (can be used multiple times)
+--clear-plugins                                   Remove all plugins added before this option
+--disable-plugin <arg>                            Disable a particular plugin by filename/name
+--important-plugin <arg>                          Add an important plugin to be run (can be used multiple times). Die if the plugin dies.
+--always-use-proxy <arg>                          Use the proxy always (default: false)
+--daemon                                          Run in the background, suppress stdout/stderr
+--wallet <arg>                                    Location of the wallet database.
+--recover <arg>                                   Populate hsm_secret with the given codex32 secret and starts the node in `offline` mode.
+--large-channels|--wumbo                          Allow channels larger than 0.16777215 BTC
+--experimental-dual-fund                          experimental: Advertise dual-funding and allow peers to establish channels via v2 channel open protocol.
+--experimental-splicing                           experimental: Enables the ability to resize channels using splicing
+--experimental-onion-messages                     EXPERIMENTAL: enable send, receive and relay of onion messages and blinded payments
+--experimental-offers                             EXPERIMENTAL: enable send and receive of offers (also sets experimental-onion-messages)
+--experimental-shutdown-wrong-funding             EXPERIMENTAL: allow shutdown with alternate txids
+--experimental-peer-storage                       EXPERIMENTAL: enable peer backup storage and restore
+--experimental-quiesce                            experimental: Advertise ability to quiesce channels.
+--experimental-anchors                            EXPERIMENTAL: enable option_anchors_zero_fee_htlc_tx to open zero-fee-anchor channels
+--help|-h                                         Print this message.
+--rgb <arg>                                       RRGGBB hex color for node
+--alias <arg>                                     Up to 32-byte alias for node
+--pid-file=<file>                                 Specify pid file (default: "/home/ueno/.lightning/lightningd-regtest.pid")
+--ignore-fee-limits <arg>                         (DANGEROUS) allow peer to set any feerate (default: true)
+--watchtime-blocks <arg>                          Blocks before peer can unilaterally spend funds (default: 6)
+--max-locktime-blocks <arg>                       Maximum blocks funds may be locked for (default: 2016)
+--funding-confirms <arg>                          Confirmations required for funding transaction (default: 1)
+--require-confirmed-inputs <arg>                  Confirmations required for inputs to funding transaction (v2 opens only) (default: false)
+--cltv-delta <arg>                                Number of blocks for cltv_expiry_delta (default: 6)
+--cltv-final <arg>                                Number of blocks for final cltv_expiry (default: 10)
+--commit-time=<millseconds>                       Time after changes before sending out COMMIT (default: 10)
+--fee-base <arg>                                  Millisatoshi minimum to charge for HTLC (default: 1)
+--rescan <arg>                                    Number of blocks to rescan from the current head, or absolute blockheight if negative (default: 30)
+--fee-per-satoshi <arg>                           Microsatoshi fee for every satoshi in HTLC (default: 10)
+--htlc-minimum-msat <arg>                         The default minimal value an HTLC must carry in order to be forwardable for new channels (default: 0)
+--htlc-maximum-msat <arg>                         The default maximal value an HTLC must carry in order to be forwardable for new channel (default: 18446744073709551615)
+--max-concurrent-htlcs <arg>                      Number of HTLCs one channel can handle concurrently. Should be between 1 and 483 (default: 483)
+--max-dust-htlc-exposure-msat <arg>               Max HTLC amount that can be trimmed (default: 50000000)
+--min-capacity-sat <arg>                          Minimum capacity in satoshis for accepting channels (default: 10000)
+--addr <arg>                                      Set an IP address (v4 or v6) to listen on and announce to the network for incoming connections
+--bind-addr <arg>                                 Set an IP address (v4 or v6) to listen on, but not announce
+--announce-addr <arg>                             Set an IP address (v4 or v6) or .onion v3 to announce, but not listen on
+--announce-addr-discovered <arg>                  Explicitly turns IP discovery 'on' or 'off'. (default: auto)
+--announce-addr-discovered-port <arg>             Sets the public TCP port to use for announcing discovered IPs. (default: 19846)
+--offline                                         Start in offline-mode (do not automatically reconnect and do not accept incoming connections)
+--autolisten <arg>                                If true, listen on default port and announce if it seems to be a public interface (default: true)
+--proxy <arg>                                     Set a socks v5 proxy IP address and port
+--tor-service-password <arg>                      Set a Tor hidden service password
+--accept-htlc-tlv-type <arg>                      HTLC TLV type to accept (can be used multiple times)
+--disable-dns                                     Disable DNS lookups of peers
+--encrypted-hsm                                   Set the password to encrypt hsm_secret with. If no password is passed through command line, you will be prompted to enter it.
+--rpc-file-mode <arg>                             Set the file mode (permissions) for the JSON-RPC socket (default: 0600)
+--force-feerates <arg>                            Set testnet/regtest feerates in sats perkw, opening/mutual_close/unlateral_close/delayed_to_us/htlc_resolution/penalty: if fewer specified, last
+                                                  number applies to remainder
+--commit-fee <arg>                                Percentage of fee to request for their commitment (default: 100)
+--min-emergency-msat <arg>                        Amount to leave in wallet for spending anchor closes (default: 25000000)
+--subdaemon <arg>                                 Arg specified as SUBDAEMON:PATH. Specifies an alternate subdaemon binary. If the supplied path is relative the subdaemon binary is found in the
+                                                  working directory. This option may be specified multiple times. For example, --subdaemon=hsmd:remote_signer would use a hypothetical remote
+                                                  signing subdaemon.
+--experimental-upgrade-protocol                   experimental: allow channel types to be upgraded on reconnect
+--database-upgrade <arg>                          Set to true to allow database upgrades even on non-final releases (WARNING: you won't be able to downgrade!)
+--log-level <arg>                                 log level (io, debug, info, unusual, broken) [:prefix] (default: debug)
+--log-timestamps <arg>                            prefix log messages with timestamp (default: true)
+--log-prefix <arg>                                log prefix
+--log-file=<file>                                 Also log to file (- for stdout)
+--renepay-debug-mcf                               Enable renepay MCF debug info.
+--renepay-debug-payflow                           Enable renepay payment flows debug info.
+--bitcoin-datadir <arg>                           -datadir arg for bitcoin-cli
+--bitcoin-cli <arg>                               bitcoin-cli pathname
+--bitcoin-rpcuser <arg>                           bitcoind RPC username
+--bitcoin-rpcpassword <arg>                       bitcoind RPC password
+--bitcoin-rpcconnect <arg>                        bitcoind RPC host to connect to
+--bitcoin-rpcport <arg>                           bitcoind RPC host's port
+--bitcoin-retry-timeout <arg>                     how long to keep retrying to contact bitcoind before fatally exiting
+--funder-policy <arg>                             Policy to use for dual-funding requests. [match, available, fixed]
+--funder-policy-mod <arg>                         Percent to apply policy at (match/available); or amount to fund (fixed)
+--funder-min-their-funding <arg>                  Minimum funding peer must open with to activate our policy
+--funder-max-their-funding <arg>                  Maximum funding peer may open with to activate our policy
+--funder-per-channel-min <arg>                    Minimum funding we'll add to a channel. If we can't meet this, we don't fund
+--funder-per-channel-max <arg>                    Maximum funding we'll add to a channel. We cap all contributions to this
+--funder-reserve-tank <arg>                       Amount of funds we'll always leave available.
+--funder-fuzz-percent <arg>                       Percent to fuzz the policy contribution by. Defaults to 0%. Max is 100%
+--funder-fund-probability <arg>                   Percent of requests to consider. Defaults to 100%. Setting to 0% will disable dual-funding
+--funder-lease-requests-only <arg>                Only fund lease requests. Defaults to true if channel lease rates are being advertised
+--lease-fee-base-sat <arg>                        Channel lease rates, base fee for leased funds, in satoshi.
+--lease-fee-basis <arg>                           Channel lease rates, basis charged for leased funds (per 10,000 satoshi.)
+--lease-funding-weight <arg>                      Channel lease rates, weight we'll ask opening peer to pay for in funding transaction
+--channel-fee-max-base-msat <arg>                 Channel lease rates, maximum channel fee base we'll charge for funds routed through a leased channel.
+--channel-fee-max-proportional-thousandths <arg>  Channel lease rates, maximum proportional fee (in thousandths, or ppt) we'll charge for funds routed through a leased channel. Note: 1ppt =
+                                                  1,000ppm
+--disable-mpp                                     Disable multi-part payments.
+--dev-sqlfilename <arg>                           Use on-disk sqlite3 file instead of in memory (e.g. debugging)
+--fetchinvoice-noconnect                          Don't try to connect directly to fetch an invoice.
+--grpc-port <arg>                                 Which port should the grpc plugin listen for incoming connections? (default: -1)
+--autoclean-cycle <arg>                           Perform cleanup every given seconds
+--autoclean-succeededforwards-age <arg>           How old do successful forwards have to be before deletion (0 = never)
+--autoclean-failedforwards-age <arg>              How old do failed forwards have to be before deletion (0 = never)
+--autoclean-succeededpays-age <arg>               How old do successful pays have to be before deletion (0 = never)
+--autoclean-failedpays-age <arg>                  How old do failed pays have to be before deletion (0 = never)
+--autoclean-paidinvoices-age <arg>                How old do paid invoices have to be before deletion (0 = never)
+--autoclean-expiredinvoices-age <arg>             How old do expired invoices have to be before deletion (0 = never)
+--bookkeeper-dir <arg>                            Location for bookkeeper records.
+--bookkeeper-db <arg>                             Location of the bookkeeper database
 ```
 
 ### lightning-cli help
